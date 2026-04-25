@@ -271,7 +271,7 @@ def api_data():
             'status': st, 'status_color': si,
         })
 
-    pos_list.sort(key=lambda x: x['profit_pct'], reverse=True)
+    pos_list.sort(key=lambda x: x['symbol'])
     w = sum(1 for p in pos_list if p['profit_pct'] > 0)
     l = sum(1 for p in pos_list if p['profit_pct'] < 0)
     tp = sum(p['profit_usd'] for p in pos_list)
