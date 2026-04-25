@@ -139,8 +139,9 @@ class SmartCache:
         new_syms = {p['symbol'] for p in new_list}
         bought = new_syms - old_syms
         sold = old_syms - new_syms
+        # Build set of recent notification keys to prevent duplicates
         recent_keys = set()
-        for n in self.notifications[-10:]:
+        for n in self.notifications[-20:]:
             recent_keys.add(f"{n['type']}_{n['symbol']}")
         with self.notif_lock:
             for sym in bought:
@@ -410,16 +411,16 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .recent-box{background:var(--card);backdrop-filter:blur(10px);border-radius:12px;border:1px solid var(--border);padding:12px;max-height:130px;overflow-y:auto}
 .recent-box::-webkit-scrollbar{width:3px}
 .recent-box::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
-.rb-title{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:6px}
-.rb-count{background:var(--blue-bg);color:var(--blue);font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600}
 .rb-list{display:flex;flex-direction:column;gap:4px}
 .rb-item{display:flex;align-items:center;gap:8px;font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 8px;border-radius:6px;background:rgba(255,255,255,0.02);transition:all 0.2s}
 .rb-item:hover{background:rgba(255,255,255,0.04)}
 .rb-buy{border-left:3px solid var(--green)}
 .rb-sell{border-left:3px solid var(--red)}
+.rb-stoploss{border-left:3px solid var(--yellow)}
 .rb-type{font-size:9px;font-weight:700;font-family:'Inter',sans-serif;padding:2px 6px;border-radius:4px;min-width:32px;text-align:center}
 .rb-type-buy{background:var(--green-bg);color:var(--green)}
-.rb-type-sell{background:var(--red-bg);color:var(--red)}.rb-stoploss{border-left:3px solid var(--yellow)}.rb-type-stoploss{background:var(--yellow-bg);color:var(--yellow)}
+.rb-type-sell{background:var(--red-bg);color:var(--red)}
+.rb-type-stoploss{background:var(--yellow-bg);color:var(--yellow)}
 .rb-coin{font-weight:600;font-family:'Inter',sans-serif;min-width:45px;color:var(--text)}
 .rb-price{color:var(--text2);font-size:10px}
 .rb-time{color:var(--text3);font-size:9px;margin-left:auto}
@@ -430,7 +431,7 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .card:hover{border-color:var(--border2)}
 .card-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text2)}
 
-/* Charts Row - Two Charts Side by Side */
+/* Charts Row */
 .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
 .chart-card{background:var(--card);backdrop-filter:blur(10px);border-radius:14px;border:1px solid var(--border);padding:16px;transition:all 0.3s;margin-bottom:0}
 .chart-card:hover{border-color:var(--border2)}
@@ -486,20 +487,6 @@ tr:hover{background:rgba(255,255,255,0.02)}
 .pnl-bar-big .lo{background:linear-gradient(90deg,#f87171,var(--red));transition:width 0.5s}
 .pnl-label{font-size:10px;color:var(--text3);white-space:nowrap}
 
-/* Toast Notifications */
-.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
-.toast{padding:14px 20px;border-radius:12px;backdrop-filter:blur(20px);font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;animation:toastIn 0.4s ease;box-shadow:0 8px 30px rgba(0,0,0,0.4);min-width:280px;font-family:'Inter',sans-serif}
-.toast-buy{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--green)}
-.toast-sell{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
-.toast-icon{font-size:20px}
-.toast-body{flex:1}
-.toast-sym{font-size:14px;font-weight:700}
-.toast-detail{font-size:11px;opacity:0.8;font-weight:400;margin-top:2px}
-.toast-close{cursor:pointer;opacity:0.5;font-size:16px}
-.toast-close:hover{opacity:1}
-@keyframes toastIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-@keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
-
 .footer{text-align:center;color:var(--text3);font-size:10px;margin-top:16px;padding:12px;opacity:0.5}
 
 @media(max-width:700px){
@@ -521,7 +508,6 @@ table{font-size:10px}
 td,th{padding:6px 4px}
 #chart{height:220px}
 #chart2{height:220px}
-.toast{min-width:auto}
 }
 </style></head><body>
 
@@ -557,7 +543,6 @@ td,th{padding:6px 4px}
 <div class="ms"><span class="ms-icon">📉</span><span class="ms-val val-red" id="sL">-</span><span class="ms-lbl">Loss</span></div>
 </div>
 <div class="recent-box">
-
 <div id="recentList" class="rb-list"><div class="rb-empty">Waiting for trades...</div></div>
 </div>
 </div>
@@ -596,8 +581,6 @@ td,th{padding:6px 4px}
 </div>
 </div>
 
-<!-- toast removed -->
-
 <div class="footer">MSA Trading Bot © 2025 • Dashboard v3 • Auto-refresh 10s</div>
 
 <script>
@@ -613,28 +596,27 @@ setInterval(function(){document.getElementById('clk').textContent=new Date().toL
 
 function addRecentTrade(type,symbol,price,time){
 var coin=symbol.replace('/USDT','');
+var isDup=recentTrades.some(function(t){return t.type===type&&t.coin===coin;});
+if(isDup)return;
 recentTrades.unshift({type:type,coin:coin,price:price,time:time||new Date().toLocaleTimeString()});
-if(recentTrades.length>5){recentTrades=recentTrades.slice(0,5);}
+recentTrades=recentTrades.slice(0,5);
 localStorage.setItem('recentTrades',JSON.stringify(recentTrades));
 renderRecent();
 }
 
 function renderRecent(){
 var rl=document.getElementById('recentList');
-var rc=document.getElementById('rbCount');
 if(!rl)return;
 if(recentTrades.length===0){
 rl.innerHTML='<div class="rb-empty">Waiting for trades...</div>';
-if(rc)rc.textContent='0';
 return;
 }
-if(rc)rc.textContent=recentTrades.length;
 var html='';
 recentTrades.forEach(function(t){
-var isBuy=t.type==='BUY';
-var cls=isBuy?'rb-buy':'rb-sell';
-var typeCls=isBuy?'rb-type-buy':'rb-type-sell';
-var icon=isBuy?'🟢':'🔴';
+var cls,typeCls,icon;
+if(t.type==='BUY'){cls='rb-buy';typeCls='rb-type-buy';icon='🟢';}
+else if(t.type==='STOP LOSS'){cls='rb-stoploss';typeCls='rb-type-stoploss';icon='🛡️';}
+else{cls='rb-sell';typeCls='rb-type-sell';icon='🔴';}
 var priceStr=typeof t.price==='number'?'$'+t.price.toFixed(4):t.price;
 html+='<div class="rb-item '+cls+'">';
 html+='<span>'+icon+'</span>';
@@ -645,17 +627,6 @@ html+='<span class="rb-time">'+t.time+'</span>';
 html+='</div>';
 });
 rl.innerHTML=html;
-}
-
-function showToast(type,symbol,price){
-var c=document.getElementById('toasts');
-var t=document.createElement('div');
-var coin=symbol.replace('/USDT','');
-var isBuy=type==='BUY';
-t.className='toast '+(isBuy?'toast-buy':'toast-sell');
-t.innerHTML='<span class="toast-icon">'+(isBuy?'🟢':'🔴')+'</span><div class="toast-body"><div class="toast-sym">'+(isBuy?'BUY':'SELL')+' '+coin+'</div><div class="toast-detail">$'+price.toFixed(4)+' • '+new Date().toLocaleTimeString()+'</div></div><span class="toast-close" onclick="this.parentElement.remove()">✕</span>';
-c.appendChild(t);
-setTimeout(function(){t.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){t.remove()},400)},6000);
 }
 
 function initC(){
@@ -718,7 +689,6 @@ fetch('/api/chart/'+encodeURIComponent(sym))
 .then(function(r){return r.json()})
 .then(function(d){
 if(d.candles&&d.candles.length>0){
-// Chart 1 - Candles
 cs.setData(d.candles);
 lineSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.close}}));
 volSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.volume,color:c.close>=c.open?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'}}));
@@ -727,7 +697,6 @@ if(bl){cs.removePriceLine(bl);bl=null;}
 if(bp>0){bl=cs.createPriceLine({price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)})}
 ch.timeScale().fitContent();
 
-// Chart 2 - Performance (Baseline)
 var basePrice=bp>0?bp:d.candles[0].close;
 baseSeries.applyOptions({
 baseValue:{type:'price',price:basePrice},
@@ -806,7 +775,6 @@ document.getElementById('pBar').innerHTML='<div class="w" style="width:'+(s.winn
 
 if(d.notifications&&d.notifications.length>0){
 d.notifications.forEach(function(n){
-/* toast disabled */
 addRecentTrade(n.type,n.symbol,n.price,n.time||new Date().toLocaleTimeString());
 if(n.id>lastNotifId){lastNotifId=n.id;localStorage.setItem('lastNId',lastNotifId);}
 });
