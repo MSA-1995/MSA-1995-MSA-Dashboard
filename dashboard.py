@@ -247,7 +247,6 @@ def api_data():
         pu = (cp - bp) * amt
         total_invested += inv
 
-        # Dynamic SL trigger = slt * 1.5
         sl_trigger = slt * 1.5 if slt > 0 else 0
 
         if pp >= 0.5:
@@ -416,14 +415,23 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .rb-price{color:var(--text2);font-size:10px}
 .rb-time{color:var(--text3);font-size:9px;margin-left:auto}
 .rb-empty{color:var(--text3);font-size:11px;text-align:center;padding:12px 8px}
-@media(max-width:700px){.top-row{grid-template-columns:1fr}.mini-stats{justify-content:center}}
 
 /* Cards */
 .card{background:var(--card);backdrop-filter:blur(10px);border-radius:14px;border:1px solid var(--border);padding:16px;margin-bottom:16px;transition:all 0.3s}
 .card:hover{border-color:var(--border2)}
 .card-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text2)}
 
-/* Chart */
+/* Charts Row - Two Charts Side by Side */
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.chart-card{background:var(--card);backdrop-filter:blur(10px);border-radius:14px;border:1px solid var(--border);padding:16px;transition:all 0.3s;margin-bottom:0}
+.chart-card:hover{border-color:var(--border2)}
+#chart{width:100%;height:320px}
+#chart2{width:100%;height:320px}
+.perf-legend{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.perf-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);font-family:'Inter',sans-serif}
+.perf-dot{width:8px;height:8px;border-radius:50%}
+
+/* Tabs */
 .tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
 .tab{padding:6px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;font-size:10px;font-weight:500;font-family:'Inter',sans-serif;transition:all 0.3s}
 .tab:hover{border-color:var(--border2);color:var(--text)}
@@ -485,6 +493,15 @@ tr:hover{background:rgba(255,255,255,0.02)}
 
 .footer{text-align:center;color:var(--text3);font-size:10px;margin-top:16px;padding:12px;opacity:0.5}
 
+@media(max-width:700px){
+.top-row{grid-template-columns:1fr}
+.mini-stats{justify-content:center}
+}
+
+@media(max-width:900px){
+.charts-row{grid-template-columns:1fr}
+}
+
 @media(max-width:600px){
 body{padding:10px}
 .mini-stats{gap:6px}
@@ -493,7 +510,8 @@ body{padding:10px}
 .market-bar{flex-direction:column;gap:8px}
 table{font-size:10px}
 td,th{padding:6px 4px}
-#chart{height:260px}
+#chart{height:220px}
+#chart2{height:220px}
 .toast{min-width:auto}
 }
 </style></head><body>
@@ -535,10 +553,24 @@ td,th{padding:6px 4px}
 </div>
 </div>
 
-<div class="card">
-<div class="card-title">📊 Price Chart — <span id="cSym" style="color:var(--blue)">Select a coin</span></div>
-<div class="tabs" id="cTabs"></div>
+<!-- Coin Tabs -->
+<div class="tabs" id="cTabs" style="margin-bottom:12px"></div>
+
+<!-- Two Charts Side by Side -->
+<div class="charts-row">
+<div class="chart-card">
+<div class="card-title">📊 Candles — <span id="cSym" style="color:var(--blue)">Select a coin</span></div>
 <div id="chart"></div>
+</div>
+<div class="chart-card">
+<div class="card-title">📈 Performance — <span id="cSym2" style="color:var(--blue)">-</span></div>
+<div class="perf-legend">
+<div class="perf-leg-item"><div class="perf-dot" style="background:var(--green)"></div>Profit Zone</div>
+<div class="perf-leg-item"><div class="perf-dot" style="background:var(--red)"></div>Loss Zone</div>
+<div class="perf-leg-item"><div class="perf-dot" style="background:#f59e0b"></div>Buy Price</div>
+</div>
+<div id="chart2"></div>
+</div>
 </div>
 
 <div class="card">
@@ -561,10 +593,10 @@ td,th{padding:6px 4px}
 
 <script>
 var ch=null,cs=null,lineSeries=null,volSeries=null,bl=null,curSym=null;
+var ch2=null,baseSeries=null,bl2=null;
 var lastNotifId=parseInt(localStorage.getItem('lastNId')||'0');
 var coinColors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',ADA:'#0033ad',XLM:'#14b6e7',DOT:'#e6007a',AVAX:'#e84142',LTC:'#bfbbbb',UNI:'#ff007a',LINK:'#2a5ada',FIL:'#0090ff',VET:'#15bdff',ETC:'#328332',ICP:'#29abe2',THETA:'#2ab8e6',HBAR:'#8a8a8a',DOGE:'#c3a634',XRP:'#00aae4',BNB:'#f3ba2f',ALGO:'#000',TRX:'#ff0013'};
 
-// Recent trades storage (max 5, saved in localStorage)
 var recentTrades=JSON.parse(localStorage.getItem('recentTrades')||'[]');
 renderRecent();
 
@@ -614,44 +646,102 @@ var isBuy=type==='BUY';
 t.className='toast '+(isBuy?'toast-buy':'toast-sell');
 t.innerHTML='<span class="toast-icon">'+(isBuy?'🟢':'🔴')+'</span><div class="toast-body"><div class="toast-sym">'+(isBuy?'BUY':'SELL')+' '+coin+'</div><div class="toast-detail">$'+price.toFixed(4)+' • '+new Date().toLocaleTimeString()+'</div></div><span class="toast-close" onclick="this.parentElement.remove()">✕</span>';
 c.appendChild(t);
-try{var audio=new Audio('data:audio/wav;base64,UklGRl9vT19telefonXQBIA...'); audio.volume=0.3;audio.play().catch(function(){});}catch(e){}
 setTimeout(function(){t.style.animation='toastOut 0.4s ease forwards';setTimeout(function(){t.remove()},400)},6000);
 }
 
 function initC(){
 var el=document.getElementById('chart');
-ch=LightweightCharts.createChart(el,{
+var chartOpts={
 layout:{background:{type:'solid',color:'transparent'},textColor:'#64748b',fontFamily:'JetBrains Mono'},
 grid:{vertLines:{color:'rgba(255,255,255,0.02)'},horzLines:{color:'rgba(255,255,255,0.02)'}},
-width:el.clientWidth,height:350,
+width:el.clientWidth,height:320,
 timeScale:{timeVisible:true,secondsVisible:false,borderColor:'rgba(255,255,255,0.04)'},
 rightPriceScale:{borderColor:'rgba(255,255,255,0.04)'},
 crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(59,130,246,0.3)',style:3},horzLine:{color:'rgba(59,130,246,0.3)',style:3}}
-});
+};
+
+ch=LightweightCharts.createChart(el,chartOpts);
 cs=ch.addCandlestickSeries({upColor:'#10b981',downColor:'#ef4444',borderUpColor:'#10b981',borderDownColor:'#ef4444',wickUpColor:'#10b98180',wickDownColor:'#ef444480'});
 lineSeries=ch.addLineSeries({color:'#3b82f6',lineWidth:2,crosshairMarkerVisible:true,priceLineVisible:false});
 volSeries=ch.addHistogramSeries({color:'rgba(59,130,246,0.15)',priceFormat:{type:'volume'},priceScaleId:'vol'});
 ch.priceScale('vol').applyOptions({scaleMargins:{top:0.85,bottom:0}});
-window.addEventListener('resize',function(){ch.applyOptions({width:el.clientWidth})});
+
+var el2=document.getElementById('chart2');
+var chart2Opts={
+layout:{background:{type:'solid',color:'transparent'},textColor:'#64748b',fontFamily:'JetBrains Mono'},
+grid:{vertLines:{color:'rgba(255,255,255,0.02)'},horzLines:{color:'rgba(255,255,255,0.03)'}},
+width:el2.clientWidth,height:320,
+timeScale:{timeVisible:true,secondsVisible:false,borderColor:'rgba(255,255,255,0.04)'},
+rightPriceScale:{borderColor:'rgba(255,255,255,0.04)'},
+crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(139,92,246,0.3)',style:3},horzLine:{color:'rgba(139,92,246,0.3)',style:3}}
+};
+
+ch2=LightweightCharts.createChart(el2,chart2Opts);
+baseSeries=ch2.addBaselineSeries({
+baseValue:{type:'price',price:0},
+topLineColor:'#10b981',
+topFillColor1:'rgba(16,185,129,0.28)',
+topFillColor2:'rgba(16,185,129,0.02)',
+bottomLineColor:'#ef4444',
+bottomFillColor1:'rgba(239,68,68,0.02)',
+bottomFillColor2:'rgba(239,68,68,0.28)',
+lineWidth:2,
+priceLineVisible:false
+});
+
+window.addEventListener('resize',function(){
+ch.applyOptions({width:document.getElementById('chart').clientWidth});
+ch2.applyOptions({width:document.getElementById('chart2').clientWidth});
+});
 }
 
 function loadC(sym,bp){
 curSym=sym;
 var coin=sym.replace('/USDT','');
-document.getElementById('cSym').textContent=sym;
-document.getElementById('cSym').style.color=coinColors[coin]||'#3b82f6';
+var cc=coinColors[coin]||'#3b82f6';
+document.getElementById('cSym').textContent=coin+'/USDT';
+document.getElementById('cSym').style.color=cc;
+document.getElementById('cSym2').textContent=coin+' vs Buy Price';
+document.getElementById('cSym2').style.color=cc;
 document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('act',t.getAttribute('data-s')===sym)});
+
 fetch('/api/chart/'+encodeURIComponent(sym))
 .then(function(r){return r.json()})
 .then(function(d){
 if(d.candles&&d.candles.length>0){
+// Chart 1 - Candles
 cs.setData(d.candles);
 lineSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.close}}));
 volSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.volume,color:c.close>=c.open?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'}}));
-if(bl){cs.removePriceLine(bl)}
+
+if(bl){cs.removePriceLine(bl);bl=null;}
 if(bp>0){bl=cs.createPriceLine({price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)})}
 ch.timeScale().fitContent();
-}});
+
+// Chart 2 - Performance (Baseline)
+var basePrice=bp>0?bp:d.candles[0].close;
+baseSeries.applyOptions({
+baseValue:{type:'price',price:basePrice},
+topLineColor:'#10b981',
+topFillColor1:'rgba(16,185,129,0.28)',
+topFillColor2:'rgba(16,185,129,0.02)',
+bottomLineColor:'#ef4444',
+bottomFillColor1:'rgba(239,68,68,0.02)',
+bottomFillColor2:'rgba(239,68,68,0.28)',
+lineWidth:2
+});
+baseSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.close}}));
+
+if(bl2){baseSeries.removePriceLine(bl2);bl2=null;}
+if(bp>0){
+bl2=baseSeries.createPriceLine({
+price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,
+axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)
+});
+}
+ch2.timeScale().fitContent();
+}
+});
 }
 
 function getMacroColor(s){
@@ -677,7 +767,6 @@ fetch('/api/data?after='+lastNotifId)
 var s=d.summary;
 var bs=d.bot_status||{};
 
-// Market Status Bar
 var macro=bs.macro_status||'UNKNOWN';
 var el=document.getElementById('mbMacro');
 el.textContent=getMacroEmoji(macro)+' '+macro;
@@ -692,7 +781,6 @@ document.getElementById('mbInv').textContent='$'+(bs.invested||s.total_invested|
 document.getElementById('mbLock').textContent='$'+(bs.locked_profit||0).toLocaleString(undefined,{maximumFractionDigits:2});
 document.getElementById('mbTrad').textContent='$'+(bs.tradable||0).toLocaleString(undefined,{maximumFractionDigits:2});
 
-// Mini Stats
 document.getElementById('sA').textContent=s.active+'/'+s.max_positions;
 var pnl=s.total_pnl;
 var pEl=document.getElementById('sP');
@@ -707,7 +795,6 @@ document.getElementById('lLabel').textContent=s.losers+'L';
 var tot=s.winners+s.losers||1;
 document.getElementById('pBar').innerHTML='<div class="w" style="width:'+(s.winners/tot*100)+'%"></div><div class="lo" style="width:'+(s.losers/tot*100)+'%"></div>';
 
-// Notifications → Toast + Recent Activity
 if(d.notifications&&d.notifications.length>0){
 d.notifications.forEach(function(n){
 showToast(n.type,n.symbol,n.price);
@@ -716,7 +803,6 @@ if(n.id>lastNotifId){lastNotifId=n.id;localStorage.setItem('lastNId',lastNotifId
 });
 }
 
-// Table
 var tb=document.getElementById('tBody');
 tb.innerHTML='';
 var tabs=document.getElementById('cTabs');
@@ -731,7 +817,6 @@ var bc='b-'+p.status_color;
 var barW=Math.min(Math.abs(p.profit_pct)*20,100);
 var barC=p.profit_pct>=0?'var(--green)':'var(--red)';
 
-// SL display
 var slHtml='-';
 if(p.sl_threshold>0){
 slHtml='<div class="sl-info"><span class="sl-val">-'+p.sl_threshold.toFixed(1)+'%</span>';
