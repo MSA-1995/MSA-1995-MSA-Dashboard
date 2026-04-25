@@ -162,7 +162,13 @@ class SmartCache:
                 pos = next((p for p in old_list if p['symbol'] == sym), None)
                 buy_price = float(pos.get('buy_price', 0)) if pos else 0
                 slt = float(pos.get('stop_loss_threshold', 0) or 0) if pos else 0
-                sell_type = 'STOP LOSS' if slt > 0 else 'SELL'
+                last_cp = self.prices.get(sym, 0)
+                if last_cp and buy_price and last_cp > buy_price:
+                    sell_type = 'TAKE PROFIT'
+                elif slt > 0:
+                    sell_type = 'STOP LOSS'
+                else:
+                    sell_type = 'SELL'
                 if f"{sell_type}_{sym}" in recent_keys:
                     continue
                 self.notifications.append({
@@ -420,6 +426,8 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .rb-item:hover{background:rgba(255,255,255,0.04)}
 .rb-buy{border-left:3px solid var(--green)}
 .rb-sell{border-left:3px solid var(--red)}
+.rb-takeprofit{border-left:3px solid #10b981}
+.rb-type-takeprofit{background:rgba(16,185,129,0.1);color:#10b981}
 .rb-stoploss{border-left:3px solid var(--yellow)}
 .rb-type{font-size:9px;font-weight:700;font-family:'Inter',sans-serif;padding:2px 6px;border-radius:4px;min-width:32px;text-align:center}
 .rb-type-buy{background:var(--green-bg);color:var(--green)}
@@ -619,6 +627,7 @@ var html='';
 recentTrades.forEach(function(t){
 var cls,typeCls,icon;
 if(t.type==='BUY'){cls='rb-buy';typeCls='rb-type-buy';icon='🟢';}
+else if(t.type==='TAKE PROFIT'){cls='rb-takeprofit';typeCls='rb-type-takeprofit';icon='💰';}
 else if(t.type==='STOP LOSS'){cls='rb-stoploss';typeCls='rb-type-stoploss';icon='🛡️';}
 else{cls='rb-sell';typeCls='rb-type-sell';icon='🔴';}
 var priceStr=typeof t.price==='number'?'$'+t.price.toFixed(4):t.price;
