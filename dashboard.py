@@ -110,6 +110,7 @@ class SmartCache:
         self.last_status = 0
         self.notifications = []
         self.notif_lock = threading.Lock()
+        self.initialized = False
 
     def get_positions(self):
         now = time.time()
@@ -135,6 +136,9 @@ class SmartCache:
         return self.bot_status
 
     def _detect_changes(self, old_list, new_list):
+        if not self.initialized:
+            self.initialized = True
+            return
         old_syms = {p['symbol'] for p in old_list}
         new_syms = {p['symbol'] for p in new_list}
         bought = new_syms - old_syms
