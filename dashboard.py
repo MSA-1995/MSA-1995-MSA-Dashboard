@@ -541,7 +541,7 @@ td,th{padding:6px 4px}
 
 <script>
 var ch=null,cs=null,lineSeries=null,volSeries=null,bl=null,curSym=null;
-var lastNotifId=0;
+var lastNotifId=parseInt(localStorage.getItem('lastNId')||'0');
 var coinColors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',ADA:'#0033ad',XLM:'#14b6e7',DOT:'#e6007a',AVAX:'#e84142',LTC:'#bfbbbb',UNI:'#ff007a',LINK:'#2a5ada',FIL:'#0090ff',VET:'#15bdff',ETC:'#328332',ICP:'#29abe2',THETA:'#2ab8e6',HBAR:'#8a8a8a',DOGE:'#c3a634',XRP:'#00aae4',BNB:'#f3ba2f',ALGO:'#000',TRX:'#ff0013'};
 
 setInterval(function(){document.getElementById('clk').textContent=new Date().toLocaleTimeString()},1000);
@@ -651,7 +651,7 @@ document.getElementById('pBar').innerHTML='<div class="w" style="width:'+(s.winn
 if(d.notifications&&d.notifications.length>0){
 d.notifications.forEach(function(n){
 showToast(n.type,n.symbol,n.price);
-if(n.id>lastNotifId)lastNotifId=n.id;
+if(n.id>lastNotifId){lastNotifId=n.id;localStorage.setItem('lastNId',lastNotifId);}
 });
 }
 
