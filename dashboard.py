@@ -139,8 +139,13 @@ class SmartCache:
         new_syms = {p['symbol'] for p in new_list}
         bought = new_syms - old_syms
         sold = old_syms - new_syms
+        recent_keys = set()
+        for n in self.notifications[-10:]:
+            recent_keys.add(f"{n['type']}_{n['symbol']}")
         with self.notif_lock:
             for sym in bought:
+                if f"BUY_{sym}" in recent_keys:
+                    continue
                 pos = next((p for p in new_list if p['symbol'] == sym), None)
                 price = float(pos.get('buy_price', 0)) if pos else 0
                 self.notifications.append({
@@ -150,9 +155,13 @@ class SmartCache:
                 })
             for sym in sold:
                 pos = next((p for p in old_list if p['symbol'] == sym), None)
-                price = float(pos.get('buy_price', 0)) if pos else 0
+                buy_price = float(pos.get('buy_price', 0)) if pos else 0
+                slt = float(pos.get('stop_loss_threshold', 0) or 0) if pos else 0
+                sell_type = 'STOP LOSS' if slt > 0 else 'SELL'
+                if f"{sell_type}_{sym}" in recent_keys:
+                    continue
                 self.notifications.append({
-                    'type': 'SELL', 'symbol': sym, 'price': price,
+                    'type': sell_type, 'symbol': sym, 'price': buy_price,
                     'time': datetime.now(timezone.utc).strftime('%H:%M:%S'),
                     'id': int(time.time() * 1000)
                 })
@@ -587,7 +596,7 @@ td,th{padding:6px 4px}
 </div>
 </div>
 
-<div class="toast-container" id="toasts"></div>
+<!-- toast removed -->
 
 <div class="footer">MSA Trading Bot © 2025 • Dashboard v3 • Auto-refresh 10s</div>
 
@@ -797,7 +806,7 @@ document.getElementById('pBar').innerHTML='<div class="w" style="width:'+(s.winn
 
 if(d.notifications&&d.notifications.length>0){
 d.notifications.forEach(function(n){
-showToast(n.type,n.symbol,n.price);
+/* toast disabled */
 addRecentTrade(n.type,n.symbol,n.price,n.time||new Date().toLocaleTimeString());
 if(n.id>lastNotifId){lastNotifId=n.id;localStorage.setItem('lastNId',lastNotifId);}
 });
