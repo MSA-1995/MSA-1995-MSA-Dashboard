@@ -410,7 +410,7 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .rb-sell{border-left:3px solid var(--red)}
 .rb-type{font-size:9px;font-weight:700;font-family:'Inter',sans-serif;padding:2px 6px;border-radius:4px;min-width:32px;text-align:center}
 .rb-type-buy{background:var(--green-bg);color:var(--green)}
-.rb-type-sell{background:var(--red-bg);color:var(--red)}
+.rb-type-sell{background:var(--red-bg);color:var(--red)}.rb-stoploss{border-left:3px solid var(--yellow)}.rb-type-stoploss{background:var(--yellow-bg);color:var(--yellow)}
 .rb-coin{font-weight:600;font-family:'Inter',sans-serif;min-width:45px;color:var(--text)}
 .rb-price{color:var(--text2);font-size:10px}
 .rb-time{color:var(--text3);font-size:9px;margin-left:auto}
@@ -548,7 +548,7 @@ td,th{padding:6px 4px}
 <div class="ms"><span class="ms-icon">📉</span><span class="ms-val val-red" id="sL">-</span><span class="ms-lbl">Loss</span></div>
 </div>
 <div class="recent-box">
-<div class="rb-title">📋 Recent Activity <span class="rb-count" id="rbCount">0</span></div>
+
 <div id="recentList" class="rb-list"><div class="rb-empty">Waiting for trades...</div></div>
 </div>
 </div>
