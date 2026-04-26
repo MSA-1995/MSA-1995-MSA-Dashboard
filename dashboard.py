@@ -678,7 +678,11 @@ canvas.height=320;
 var ctx=canvas.getContext('2d');
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-var candles=candleData.slice(-50);
+var raw=candleData.slice(-50);
+var closes=raw.map(function(c){return c.close});
+var median=closes.sort(function(a,b){return a-b})[Math.floor(closes.length/2)];
+var candles=raw.filter(function(c){return c.low>median*0.5&&c.high<median*2;});
+if(candles.length<2)candles=raw.slice(-20);
 var allHigh=candles.map(function(c){return c.high});
 var allLow=candles.map(function(c){return c.low});
 var min=Math.min.apply(null,allLow);
