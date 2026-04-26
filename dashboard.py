@@ -584,10 +584,10 @@ td,th{padding:6px 4px}
 <div id="chart"></div>
 </div>
 <div class="chart-card">
-<div class="card-title">📈 Performance — <span id="cSym2" style="color:var(--blue)">-</span></div>
+<div class="card-title">📈 Live Price — <span id="cSym2" style="color:var(--blue)">-</span></div>
 <div class="perf-legend">
-<div class="perf-leg-item"><div class="perf-dot" style="background:var(--green)"></div>Profit Zone</div>
-<div class="perf-leg-item"><div class="perf-dot" style="background:var(--red)"></div>Loss Zone</div>
+
+
 <div class="perf-leg-item"><div class="perf-dot" style="background:#f59e0b"></div>Buy Price</div><div class="perf-leg-item"><div class="perf-dot" style="background:#10b981"></div>TP</div><div class="perf-leg-item"><div class="perf-dot" style="background:#ef4444"></div>SL</div><div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
 </div>
 <div id="chart2"></div>
@@ -685,16 +685,14 @@ crosshair:{mode:LightweightCharts.CrosshairMode.Normal,vertLine:{color:'rgba(139
 };
 
 ch2=LightweightCharts.createChart(el2,chart2Opts);
-baseSeries=ch2.addBaselineSeries({
-baseValue:{type:'price',price:0},
-topLineColor:'#10b981',
-topFillColor1:'rgba(16,185,129,0.28)',
-topFillColor2:'rgba(16,185,129,0.02)',
-bottomLineColor:'#ef4444',
-bottomFillColor1:'rgba(239,68,68,0.02)',
-bottomFillColor2:'rgba(239,68,68,0.28)',
+baseSeries=ch2.addLineSeries({
+color:'#3b82f6',
 lineWidth:2,
-priceLineVisible:false
+priceLineVisible:true,
+lastValueVisible:true,
+crosshairMarkerVisible:true,
+crosshairMarkerRadius:6
+});
 });
 
 window.addEventListener('resize',function(){
@@ -725,17 +723,6 @@ if(bl){cs.removePriceLine(bl);bl=null;}
 if(bp>0){bl=cs.createPriceLine({price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)})}
 ch.timeScale().fitContent();
 
-var basePrice=bp>0?bp:d.candles[0].close;
-baseSeries.applyOptions({
-baseValue:{type:'price',price:basePrice},
-topLineColor:'#10b981',
-topFillColor1:'rgba(16,185,129,0.28)',
-topFillColor2:'rgba(16,185,129,0.02)',
-bottomLineColor:'#ef4444',
-bottomFillColor1:'rgba(239,68,68,0.02)',
-bottomFillColor2:'rgba(239,68,68,0.28)',
-lineWidth:2
-});
 baseSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.close}}));
 
 if(bl2){baseSeries.removePriceLine(bl2);bl2=null;}
