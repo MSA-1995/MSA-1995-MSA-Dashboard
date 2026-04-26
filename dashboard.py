@@ -24,7 +24,7 @@ BINANCE_API = "https://api.binance.com/api/v3"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = SECRET_KEY
 
 
@@ -355,7 +355,7 @@ button:hover{{transform:translateY(-2px);box-shadow:0 8px 25px rgba(59,130,246,0
 .err{{color:#f87171;margin-bottom:16px;font-size:13px;padding:10px;background:rgba(248,113,113,0.1);border-radius:8px}}
 </style></head><body>
 <form class="box" method="POST">
-<div class="logo">🤖</div>
+<div class="logo"><img src="/static/logo.png" style="width:60px;height:60px;border-radius:15px"></div>
 <h1>MSA Trading Bot</h1>
 <p class="sub">Professional Trading Dashboard</p>
 {"<div class='err'>"+error+"</div>" if error else ""}
@@ -525,7 +525,7 @@ td,th{padding:6px 4px}
 
 <div class="header">
 <div class="header-left">
-<div class="logo-sm">🤖</div>
+<div class="logo-sm"><img src="/static/logo.png" style="width:30px;height:30px;border-radius:8px"></div>
 <h1>MSA Trading Bot</h1>
 </div>
 <div class="header-right">
