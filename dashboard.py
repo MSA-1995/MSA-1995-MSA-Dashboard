@@ -700,7 +700,7 @@ var pad=25;
 var W=canvas.width;
 var H=canvas.height;
 var stepX=(W-pad*2)/(maxPoints-1);
-var startIdx=maxPoints-prices.length;
+var startIdx=0;
 ctx.strokeStyle='rgba(255,255,255,0.03)';
 ctx.lineWidth=1;
 for(var g=0;g<5;g++){var gy=pad+(H-pad*2)*g/4;ctx.beginPath();ctx.moveTo(pad,gy);ctx.lineTo(W-pad,gy);ctx.stroke();}
@@ -711,10 +711,10 @@ ctx.lineJoin='round';
 ctx.lineCap='round';
 var lastX=0,lastY=0;
 for(var i=0;i<prices.length;i++){
-var x=pad+(startIdx+i)*stepX;
+var x=pad+i*((W-pad*2)/(prices.length-1||1));
 var y=H-pad-((prices[i]-min)/range)*(H-pad*2);
 if(i===0){ctx.moveTo(x,y);}
-else{var prevX=pad+(startIdx+i-1)*stepX;var prevY=H-pad-((prices[i-1]-min)/range)*(H-pad*2);var cpX=(prevX+x)/2;ctx.bezierCurveTo(cpX,prevY,cpX,y,x,y);}
+else{var prevX=pad+(i-1)*((W-pad*2)/(prices.length-1||1));var prevY=H-pad-((prices[i-1]-min)/range)*(H-pad*2);var cpX=(prevX+x)/2;ctx.bezierCurveTo(cpX,prevY,cpX,y,x,y);}
 lastX=x;lastY=y;
 }
 ctx.stroke();
@@ -722,7 +722,7 @@ var grad=ctx.createLinearGradient(0,lastY,0,H);
 grad.addColorStop(0,'rgba(59,130,246,0.15)');
 grad.addColorStop(1,'rgba(59,130,246,0)');
 ctx.lineTo(lastX,H-pad);
-ctx.lineTo(pad+startIdx*stepX,H-pad);
+ctx.lineTo(pad,H-pad);
 ctx.closePath();
 ctx.fillStyle=grad;
 ctx.fill();
