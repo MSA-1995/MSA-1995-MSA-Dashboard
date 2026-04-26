@@ -127,7 +127,7 @@ class SmartCache:
 
     def get_bot_status(self):
         now = time.time()
-        if now - self.last_status > 60:
+        if now - self.last_status > 30:
             self.last_status = now
             status = db.load_bot_status()
             if status:
@@ -562,19 +562,23 @@ td,th{padding:6px 4px}
 <div class="mb-item"><span>📊</span><div><div class="mb-label">Invested</div><div class="mb-val mb-yellow" id="mbInv">-</div></div></div>
 <div class="mb-item"><span>🔒</span><div><div class="mb-label">Locked Profit</div><div class="mb-val mb-green" id="mbLock">-</div></div></div>
 <div class="mb-item"><span>💵</span><div><div class="mb-label">Tradable</div><div class="mb-val mb-yellow" id="mbTrad">-</div></div></div>
+<div class="mb-item"><span>📊</span><div><div class="mb-label">Active</div><div class="mb-val mb-blue" id="sA">-</div></div></div>
+<div class="mb-item"><span>📈</span><div><div class="mb-label">P&L</div><div class="mb-val" id="sP">-</div></div></div>
+<div class="mb-item"><span>🏆</span><div><div class="mb-label">Win</div><div class="mb-val mb-green" id="sW">-</div></div></div>
+<div class="mb-item"><span>📉</span><div><div class="mb-label">Loss</div><div class="mb-val mb-red" id="sL">-</div></div></div>
 </div>
 
-<!-- Mini Stats + Recent Activity -->
-<div class="top-row">
-<div class="mini-stats">
-<div class="ms"><span class="ms-icon">📊</span><span class="ms-val val-blue" id="sA">-</span><span class="ms-lbl">Active</span></div>
-<div class="ms"><span class="ms-icon">📈</span><span class="ms-val" id="sP">-</span><span class="ms-lbl">P&L</span></div>
-<div class="ms"><span class="ms-icon">🏆</span><span class="ms-val val-green" id="sW">-</span><span class="ms-lbl">Win</span></div>
-<div class="ms"><span class="ms-icon">📉</span><span class="ms-val val-red" id="sL">-</span><span class="ms-lbl">Loss</span></div>
-</div>
-<div class="recent-box">
-<div id="recentList" class="rb-list"><div class="rb-empty">Waiting for trades...</div></div>
-</div>
+
+
+
+
+
+
+
+
+<div class="card" style="margin-bottom:16px;padding:10px 14px">
+<div style="font-size:11px;color:var(--text3);margin-bottom:6px">🔔 Recent Trades</div>
+<div id="recentList" class="rb-list"></div>
 </div>
 
 <!-- Coin Tabs -->
