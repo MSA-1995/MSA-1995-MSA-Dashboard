@@ -385,6 +385,7 @@ def get_dashboard_html():
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>MSA Trading Bot</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -592,7 +593,7 @@ td,th{padding:6px 4px}
 
 <div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
 </div>
-<div id="chart2"></div>
+<canvas id="chart2canvas"></canvas>
 </div>
 </div>
 
@@ -614,7 +615,7 @@ td,th{padding:6px 4px}
 
 <script>
 var ch=null,cs=null,lineSeries=null,volSeries=null,bl=null,curSym=null;
-var ch2=null,baseSeries=null,headMarker=null,glowMarker=null,bl2=null,bl3=null,bl4=null,liveTimer=null;
+var ch2=null,ch2js=null,bl2=null,bl3=null,bl4=null,liveTimer=null;
 var lastNotifId=parseInt(localStorage.getItem('lastNId')||'0');
 var coinColors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',ADA:'#0033ad',XLM:'#14b6e7',DOT:'#e6007a',AVAX:'#e84142',LTC:'#bfbbbb',UNI:'#ff007a',LINK:'#2a5ada',FIL:'#0090ff',VET:'#15bdff',ETC:'#328332',ICP:'#29abe2',THETA:'#2ab8e6',HBAR:'#8a8a8a',DOGE:'#c3a634',XRP:'#00aae4',BNB:'#f3ba2f',ALGO:'#000',TRX:'#ff0013'};
 
