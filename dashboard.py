@@ -406,7 +406,7 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 /* Header */
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .header-left{display:flex;align-items:center;gap:12px}
-\.logo-sm{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 15px rgba(59,130,246,0.3)}
+.logo-sm{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 15px rgba(59,130,246,0.3)}
 .header h1{font-size:16px;font-weight:700;background:linear-gradient(135deg,#e2e8f0,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .header-right{display:flex;gap:12px;align-items:center}
 .header-right span{color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace}
