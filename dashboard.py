@@ -678,7 +678,7 @@ canvas.height=320;
 var ctx=canvas.getContext('2d');
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-var candles=candleData;
+var candles=candleData.slice(-50);
 var allHigh=candles.map(function(c){return c.high});
 var allLow=candles.map(function(c){return c.low});
 var min=Math.min.apply(null,allLow);
@@ -690,7 +690,7 @@ var W=canvas.width;
 var H=canvas.height;
 var drawW=(W-pad*2)*0.75;
 var candleW=drawW/candles.length;
-var bodyW=candleW*0.6;
+var bodyW=Math.max(candleW*0.7,2);
 
 // Grid lines
 ctx.strokeStyle='rgba(255,255,255,0.03)';
@@ -813,7 +813,7 @@ document.getElementById('cSym').style.color=cc;
 document.getElementById('cSym2').textContent=coin+' Live';
 document.getElementById('cSym2').style.color=cc;
 document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('act',t.getAttribute('data-s')===sym)});
-livePrices=[];var cvs=document.getElementById('chart2canvas');if(cvs){var ct=cvs.getContext('2d');ct.clearRect(0,0,cvs.width,cvs.height);}
+livePrices=[];candleData=[];var cvs=document.getElementById('chartCanvas');if(cvs){var ct2=cvs.getContext('2d');ct2.clearRect(0,0,cvs.width,cvs.height);}var cvs=document.getElementById('chart2canvas');if(cvs){var ct=cvs.getContext('2d');ct.clearRect(0,0,cvs.width,cvs.height);}
 fetch('/api/chart/'+encodeURIComponent(sym))
 .then(function(r){return r.json()})
 .then(function(d){
