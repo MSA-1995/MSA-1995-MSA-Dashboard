@@ -516,6 +516,8 @@ tr:hover{background:rgba(255,255,255,0.02)}
 
 .footer{text-align:center;color:var(--text3);font-size:10px;margin-top:16px;padding:12px;opacity:0.5}
 
+@keyframes headGlow{0%,100%{filter:drop-shadow(0 0 4px rgba(59,130,246,0.6))}50%{filter:drop-shadow(0 0 12px rgba(59,130,246,0.9))}}
+
 @media(max-width:700px){
 .top-row{grid-template-columns:1fr}
 .mini-stats{justify-content:center}
@@ -588,7 +590,7 @@ td,th{padding:6px 4px}
 <div class="perf-legend">
 
 
-<div class="perf-leg-item"><div class="perf-dot" style="background:#f59e0b"></div>Buy Price</div><div class="perf-leg-item"><div class="perf-dot" style="background:#10b981"></div>TP</div><div class="perf-leg-item"><div class="perf-dot" style="background:#ef4444"></div>SL</div><div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
+<div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
 </div>
 <div id="chart2"></div>
 </div>
@@ -612,7 +614,7 @@ td,th{padding:6px 4px}
 
 <script>
 var ch=null,cs=null,lineSeries=null,volSeries=null,bl=null,curSym=null;
-var ch2=null,baseSeries=null,bl2=null,bl3=null,bl4=null,liveTimer=null;
+var ch2=null,baseSeries=null,headMarker=null,glowMarker=null,bl2=null,bl3=null,bl4=null,liveTimer=null;
 var lastNotifId=parseInt(localStorage.getItem('lastNId')||'0');
 var coinColors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',ADA:'#0033ad',XLM:'#14b6e7',DOT:'#e6007a',AVAX:'#e84142',LTC:'#bfbbbb',UNI:'#ff007a',LINK:'#2a5ada',FIL:'#0090ff',VET:'#15bdff',ETC:'#328332',ICP:'#29abe2',THETA:'#2ab8e6',HBAR:'#8a8a8a',DOGE:'#c3a634',XRP:'#00aae4',BNB:'#f3ba2f',ALGO:'#000',TRX:'#ff0013'};
 
@@ -688,8 +690,8 @@ ch2=LightweightCharts.createChart(el2,chart2Opts);
 baseSeries=ch2.addLineSeries({
 color:'#3b82f6',
 lineWidth:2,
-priceLineVisible:true,
-lastValueVisible:true,
+priceLineVisible:false,
+lastValueVisible:false,
 crosshairMarkerVisible:true,
 crosshairMarkerRadius:6
 });
@@ -706,7 +708,7 @@ var coin=sym.replace('/USDT','');
 var cc=coinColors[coin]||'#3b82f6';
 document.getElementById('cSym').textContent=coin+'/USDT';
 document.getElementById('cSym').style.color=cc;
-document.getElementById('cSym2').textContent=coin+' vs Buy Price';
+document.getElementById('cSym2').textContent=coin+' Live';
 document.getElementById('cSym2').style.color=cc;
 document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('act',t.getAttribute('data-s')===sym)});
 
