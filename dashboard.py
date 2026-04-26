@@ -460,9 +460,9 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 .card-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--text2)}
 
 /* Charts Row */
-.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-.chart-card{background:var(--card);backdrop-filter:blur(10px);border-radius:14px;border:1px solid var(--border);padding:16px;transition:all 0.3s;margin-bottom:0}
-.chart-card:hover{border-color:var(--border2)}
+
+
+
 #chartCanvas{width:100%;height:320px}
 
 .perf-legend{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
@@ -525,7 +525,7 @@ tr:hover{background:rgba(255,255,255,0.02)}
 }
 
 @media(max-width:900px){
-.charts-row{grid-template-columns:1fr}
+
 }
 
 @media(max-width:600px){
@@ -761,7 +761,7 @@ var canvas=document.getElementById('chart2canvas');
 if(!canvas||livePrices.length<2)return;
 var rect=canvas.parentElement.getBoundingClientRect();
 canvas.width=rect.width;
-canvas.height=300;
+canvas.height=500;
 var ctx=canvas.getContext('2d');
 ctx.clearRect(0,0,canvas.width,canvas.height);
 var prices=livePrices;
@@ -823,7 +823,7 @@ fetch('/api/chart/'+encodeURIComponent(sym))
 .then(function(d){
 if(d.candles&&d.candles.length>0){
 candleData=d.candles;
-drawCandleChart();
+
 if(liveTimer){clearInterval(liveTimer);}
 liveTimer=setInterval(function(){
 fetch('/api/live_price/'+encodeURIComponent(sym))
@@ -836,7 +836,7 @@ var last=candleData[candleData.length-1];
 last.close=ld.price;
 if(ld.price>last.high)last.high=ld.price;
 if(ld.price<last.low)last.low=ld.price;
-drawCandleChart();
+
 }
 // Update live line chart
 livePrices.push(ld.price);
