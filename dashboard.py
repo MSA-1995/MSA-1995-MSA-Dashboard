@@ -773,7 +773,7 @@ document.getElementById('liveP').style.color=ld.price>=bp?'#10b981':'#ef4444';
 }
 });
 }
-initC();fetchD();setInterval(fetchD,10000);
+document.addEventListener('DOMContentLoaded',function(){initC();fetchD();setInterval(fetchD,10000);});
 </script>
 </body></html>"""
 
