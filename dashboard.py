@@ -583,8 +583,8 @@ td,th{padding:6px 4px}
 <!-- Two Charts Side by Side -->
 <div class="charts-row">
 <div class="chart-card">
-<div class="card-title">📊 Candles — <span id="cSym" style="color:var(--blue)">Select a coin</span></div>
-<canvas id="chartCanvas" style="width:100%;height:320px;display:block"></canvas>
+
+
 </div>
 <div class="chart-card">
 <div class="card-title">📈 Live Price — <span id="cSym2" style="color:var(--blue)">-</span></div>
@@ -761,7 +761,7 @@ var canvas=document.getElementById('chart2canvas');
 if(!canvas||livePrices.length<2)return;
 var rect=canvas.parentElement.getBoundingClientRect();
 canvas.width=rect.width;
-canvas.height=500;
+canvas.height=350;
 var ctx=canvas.getContext('2d');
 ctx.clearRect(0,0,canvas.width,canvas.height);
 var prices=livePrices;
