@@ -561,7 +561,7 @@ td,th{padding:6px 4px}
 <div class="mb-item"><span>💰</span><div><div class="mb-label">Balance</div><div class="mb-val mb-blue" id="mbBal">-</div></div></div>
 <div class="mb-item"><span>📊</span><div><div class="mb-label">Invested</div><div class="mb-val mb-yellow" id="mbInv">-</div></div></div>
 <div class="mb-item"><span>🔒</span><div><div class="mb-label">Locked Profit</div><div class="mb-val mb-green" id="mbLock">-</div></div></div>
-<div class="mb-item"><span>💵</span><div><div class="mb-label">Tradable</div><div class="mb-val mb-purple" id="mbTrad">-</div></div></div>
+<div class="mb-item"><span>💵</span><div><div class="mb-label">Tradable</div><div class="mb-val mb-yellow" id="mbTrad">-</div></div></div>
 </div>
 
 <!-- Mini Stats + Recent Activity -->
@@ -593,7 +593,7 @@ td,th{padding:6px 4px}
 
 <div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
 </div>
-<canvas id="chart2canvas" style="width:100%;height:300px;display:block"></canvas>
+<canvas id="chart2canvas" style="width:100%;height:350px;display:block"></canvas>
 </div>
 </div>
 
@@ -812,8 +812,8 @@ curSym=sym;
 curBuyPrice=bp;
 var coin=sym.replace('/USDT','');
 var cc=coinColors[coin]||'#3b82f6';
-var cSymEl=document.getElementById('cSym');if(cSymEl)cSymEl.textContent=coin+'/USDT';
-if(cSymEl)cSymEl.style.color=cc;
+
+
 document.getElementById('cSym2').textContent=coin+' Live';
 document.getElementById('cSym2').style.color=cc;
 document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('act',t.getAttribute('data-s')===sym)});
