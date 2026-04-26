@@ -738,7 +738,7 @@ document.getElementById('liveP').textContent='$'+ld.price.toFixed(4);
 document.getElementById('liveP').style.color=ld.price>=bp?'#10b981':'#ef4444';
 }
 });
-},5000);
+},1000);
 }
 });
 }
