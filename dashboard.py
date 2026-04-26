@@ -89,11 +89,12 @@ class DashboardDB:
             row = cur.fetchone()
             conn.close()
             if row and row[0]:
-                return json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                data = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                logger.info(f"bot_status from DB: macro={data.get('macro_status','?')} time={data.get('time','?')}")
+                return data
         except Exception as e:
             logger.error(f"Status error: {e}")
         return {}
-
 
 db = DashboardDB()
 
