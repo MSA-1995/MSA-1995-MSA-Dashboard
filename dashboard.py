@@ -722,21 +722,6 @@ if(bl){cs.removePriceLine(bl);bl=null;}
 if(bp>0){bl=cs.createPriceLine({price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)})}
 ch.timeScale().fitContent();
 
-baseSeries.setData(d.candles.map(function(c){return{time:c.time,value:c.close}}));
-
-if(bl2){baseSeries.removePriceLine(bl2);bl2=null;}
-if(bp>0){
-bl2=baseSeries.createPriceLine({
-price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,
-axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)
-});
-}
-// === TP and SL Lines ===
-if(bl3){baseSeries.removePriceLine(bl3);bl3=null;}
-if(bl4){baseSeries.removePriceLine(bl4);bl4=null;}
-if(tpP>0){bl3=baseSeries.createPriceLine({price:tpP,color:'#10b981',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'TP'});}
-if(slP>0){bl4=baseSeries.createPriceLine({price:slP,color:'#ef4444',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'SL'});}
-ch2.timeScale().fitContent();
 // === Live Price Updater ===
 if(liveTimer){clearInterval(liveTimer);}
 liveTimer=setInterval(function(){
