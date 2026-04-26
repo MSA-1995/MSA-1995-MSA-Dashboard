@@ -693,7 +693,6 @@ lastValueVisible:true,
 crosshairMarkerVisible:true,
 crosshairMarkerRadius:6
 });
-});
 
 window.addEventListener('resize',function(){
 ch.applyOptions({width:document.getElementById('chart').clientWidth});
