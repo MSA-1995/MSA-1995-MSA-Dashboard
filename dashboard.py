@@ -745,7 +745,26 @@ price:bp,color:'#f59e0b',lineWidth:2,lineStyle:2,
 axisLabelVisible:true,title:'Buy: $'+bp.toFixed(2)
 });
 }
+// === TP and SL Lines ===
+if(bl3){baseSeries.removePriceLine(bl3);bl3=null;}
+if(bl4){baseSeries.removePriceLine(bl4);bl4=null;}
+if(tpP>0){bl3=baseSeries.createPriceLine({price:tpP,color:'#10b981',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'TP'});}
+if(slP>0){bl4=baseSeries.createPriceLine({price:slP,color:'#ef4444',lineWidth:2,lineStyle:2,axisLabelVisible:true,title:'SL'});}
 ch2.timeScale().fitContent();
+// === Live Price Updater ===
+if(liveTimer){clearInterval(liveTimer);}
+liveTimer=setInterval(function(){
+fetch('/api/live_price/'+encodeURIComponent(sym))
+.then(function(r){return r.json()})
+.then(function(ld){
+if(ld.price>0){
+var now=Math.floor(Date.now()/1000);
+baseSeries.update({time:now,value:ld.price});
+document.getElementById('liveP').textContent='$'+ld.price.toFixed(4);
+document.getElementById('liveP').style.color=ld.price>=bp?'#10b981':'#ef4444';
+}
+});
+},5000);
 }
 });
 }
