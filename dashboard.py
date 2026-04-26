@@ -773,6 +773,101 @@ document.getElementById('liveP').style.color=ld.price>=bp?'#10b981':'#ef4444';
 }
 });
 }
+function getMacroColor(s){
+if(!s)return'var(--text3)';
+s=s.toUpperCase();
+if(s.indexOf('BULL')>=0)return'var(--green)';
+if(s.indexOf('BEAR')>=0)return'var(--red)';
+return'var(--yellow)';
+}
+
+function getMacroEmoji(s){
+if(!s)return'⚪';
+s=s.toUpperCase();
+if(s.indexOf('BULL')>=0)return'🟢';
+if(s.indexOf('BEAR')>=0)return'🔴';
+return'🟡';
+}
+
+function fetchD(){
+fetch('/api/data?after='+lastNotifId)
+.then(function(r){return r.json()})
+.then(function(d){
+var s=d.summary;
+var bs=d.bot_status||{};
+var macro=bs.macro_status||'UNKNOWN';
+var el=document.getElementById('mbMacro');
+el.textContent=getMacroEmoji(macro)+' '+macro;
+el.style.color=getMacroColor(macro);
+var i1=bs['1h_icon']||'⚪';
+var i4=bs['4h_icon']||'⚪';
+document.getElementById('mbTF').innerHTML='1h'+i1+' | 4h'+i4;
+document.getElementById('mbBal').textContent='$'+(bs.balance||0).toLocaleString(undefined,{maximumFractionDigits:2});
+document.getElementById('mbInv').textContent='$'+(bs.invested||s.total_invested||0).toLocaleString(undefined,{maximumFractionDigits:2});
+document.getElementById('mbLock').textContent='$'+(bs.locked_profit||0).toLocaleString(undefined,{maximumFractionDigits:2});
+document.getElementById('mbTrad').textContent='$'+(bs.tradable||0).toLocaleString(undefined,{maximumFractionDigits:2});
+document.getElementById('sA').textContent=s.active+'/'+s.max_positions;
+var pnl=s.total_pnl;
+var pEl=document.getElementById('sP');
+pEl.textContent=(pnl>=0?'+$':'-$')+Math.abs(pnl).toFixed(2);
+pEl.className='ms-val '+(pnl>=0?'val-green':'val-red');
+document.getElementById('sW').textContent=s.winners;
+document.getElementById('sL').textContent=s.losers;
+document.getElementById('upd').textContent=d.last_update;
+document.getElementById('wLabel').textContent=s.winners+'W';
+document.getElementById('lLabel').textContent=s.losers+'L';
+var tot=s.winners+s.losers||1;
+document.getElementById('pBar').innerHTML='<div class="w" style="width:'+(s.winners/tot*100)+'%"></div><div class="lo" style="width:'+(s.losers/tot*100)+'%"></div>';
+if(d.notifications&&d.notifications.length>0){
+d.notifications.forEach(function(n){
+addRecentTrade(n.type,n.symbol,n.price,n.time||new Date().toLocaleTimeString());
+if(n.id>lastNotifId){lastNotifId=n.id;localStorage.setItem('lastNId',lastNotifId);}
+});
+}
+var tb=document.getElementById('tBody');
+tb.innerHTML='';
+var tabs=document.getElementById('cTabs');
+tabs.innerHTML='';
+d.positions.forEach(function(p){
+var coin=p.symbol.replace('/USDT','');
+var cc=coinColors[coin]||'#3b82f6';
+var pc=p.profit_pct>0?'pos':(p.profit_pct<0?'neg':'zer');
+var uc=p.profit_usd>0?'pos':(p.profit_usd<0?'neg':'zer');
+var bc='b-'+p.status_color;
+var barW=Math.min(Math.abs(p.profit_pct)*20,100);
+var barC=p.profit_pct>=0?'var(--green)':'var(--red)';
+var slHtml='-';
+if(p.sl_threshold>0){
+slHtml='<div class="sl-info"><span class="sl-val">-'+p.sl_threshold.toFixed(1)+'%</span>';
+if(p.sl_trigger>0){slHtml+='<br><span class="sl-trigger">Trigger: -'+p.sl_trigger.toFixed(1)+'%</span>';}
+slHtml+='</div>';
+}
+var row=document.createElement('tr');
+row.innerHTML='<td><div class="coin-name"><div class="coin-icon" style="background:'+cc+'15;color:'+cc+'">'+coin.substring(0,3)+'</div><div><div class="coin-sym">'+coin+'</div><div class="coin-pair">USDT</div></div></div></td>'+'<td class="'+pc+'">'+(p.profit_pct>0?'+':'')+p.profit_pct.toFixed(2)+'%<div class="pnl-bar"><div class="pnl-fill" style="width:'+barW+'%;background:'+barC+'"></div></div></td>'+'<td class="'+uc+'">'+(p.profit_usd>=0?'+$':'-$')+Math.abs(p.profit_usd).toFixed(2)+'</td>'+'<td>$'+fmtP(p.buy_price)+'</td>'+'<td>$'+fmtP(p.current_price)+'</td>'+'<td>$'+fmtP(p.highest_price)+'</td>'+'<td>$'+p.invested.toFixed(0)+'</td>'+'<td>'+slHtml+'</td>'+'<td><span class="badge '+bc+'">'+p.status+'</span></td>'+'<td></td>';
+var btn=document.createElement('button');
+btn.className='chart-btn';btn.textContent='📈';
+btn.onclick=function(){loadC(p.symbol,p.buy_price,p.sl_price||0,p.tp_price||0)};
+row.lastChild.appendChild(btn);
+tb.appendChild(row);
+var tabBtn=document.createElement('button');
+tabBtn.className='tab'+(p.symbol===curSym?' act':'');
+tabBtn.setAttribute('data-s',p.symbol);
+tabBtn.textContent=coin;
+tabBtn.style.borderColor=cc+'30';
+tabBtn.onclick=function(){loadC(p.symbol,p.buy_price,p.sl_price||0,p.tp_price||0)};
+tabs.appendChild(tabBtn);
+});
+if(!curSym&&d.positions.length>0){var fp=d.positions[0];loadC(fp.symbol,fp.buy_price,fp.sl_price||0,fp.tp_price||0)}
+});
+}
+
+function fmtP(p){
+if(p>=1000)return p.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+if(p>=1)return p.toFixed(4);
+if(p>=0.01)return p.toFixed(6);
+return p.toFixed(8);
+}
+
 document.addEventListener('DOMContentLoaded',function(){initC();fetchD();setInterval(fetchD,10000);});
 </script>
 </body></html>"""
