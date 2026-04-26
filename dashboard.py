@@ -355,7 +355,7 @@ button:hover{{transform:translateY(-2px);box-shadow:0 8px 25px rgba(59,130,246,0
 .err{{color:#f87171;margin-bottom:16px;font-size:13px;padding:10px;background:rgba(248,113,113,0.1);border-radius:8px}}
 </style></head><body>
 <form class="box" method="POST">
-<div class="logo"><img src="/static/logo.png" style="width:60px;height:60px;border-radius:15px"></div>
+<div class="logo"><img src="/static/logo.png" style="width:70px;height:70px;border-radius:15px;object-fit:contain"></div>
 <h1>MSA Trading Bot</h1>
 <p class="sub">Professional Trading Dashboard</p>
 {"<div class='err'>"+error+"</div>" if error else ""}
@@ -391,7 +391,7 @@ radial-gradient(ellipse at 85% 100%,rgba(139,92,246,0.03) 0%,transparent 50%);po
 /* Header */
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
 .header-left{display:flex;align-items:center;gap:12px}
-.logo-sm{width:38px;height:38px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 15px rgba(59,130,246,0.3)}
+\.logo-sm{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 15px rgba(59,130,246,0.3)}
 .header h1{font-size:16px;font-weight:700;background:linear-gradient(135deg,#e2e8f0,#94a3b8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .header-right{display:flex;gap:12px;align-items:center}
 .header-right span{color:var(--text3);font-size:11px;font-family:'JetBrains Mono',monospace}
@@ -525,7 +525,7 @@ td,th{padding:6px 4px}
 
 <div class="header">
 <div class="header-left">
-<div class="logo-sm"><img src="/static/logo.png" style="width:30px;height:30px;border-radius:8px"></div>
+<div class="logo-sm"><img src="/static/logo.png" style="width:34px;height:34px;border-radius:8px;object-fit:contain"></div>
 <h1>MSA Trading Bot</h1>
 </div>
 <div class="header-right">
