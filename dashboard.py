@@ -789,7 +789,22 @@ for(var i=0;i<prices.length;i++){
 var x=pad+i*(drawW/(prices.length-1||1));
 var y=H-pad-((prices[i]-min)/range)*(H-pad*2);
 if(i===0){ctx.moveTo(x,y);}
-else{var prevX=pad+(i-1)*(drawW/(prices.length-1||1));var prevY=H-pad-((prices[i-1]-min)/range)*(H-pad*2);var cpX=(prevX+x)/2;ctx.bezierCurveTo(cpX,prevY,cpX,y,x,y);}
+else{
+var step=drawW/(prices.length-1||1);
+var prevX=pad+(i-1)*step;
+var prevY=H-pad-((prices[i-1]-min)/range)*(H-pad*2);
+var t=0.4;
+var dx=x-prevX;
+var cp1x=prevX+dx*t;
+var cp2x=x-dx*t;
+var prevPrevY=prevY;
+var nextY=y;
+if(i>=2){prevPrevY=H-pad-((prices[i-2]-min)/range)*(H-pad*2);}
+if(i<prices.length-1){nextY=H-pad-((prices[i+1]-min)/range)*(H-pad*2);}
+var cp1y=prevY+(y-prevPrevY)*0.15;
+var cp2y=y-(nextY-prevY)*0.15;
+ctx.bezierCurveTo(cp1x,cp1y,cp2x,cp2y,x,y);
+}
 lastX=x;lastY=y;
 }
 ctx.stroke();
