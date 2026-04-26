@@ -286,6 +286,8 @@ def api_data():
             'sl_threshold': round(slt, 2),
             'sl_trigger': round(sl_trigger, 2),
             'confidence': round(conf, 1),
+            'tp_price': round(bp * (1 + 0.02 + (conf / 100.0) * 0.04), 6) if bp > 0 else 0,
+            'sl_price': round(bp * (1 - slt/100), 6) if bp > 0 and slt > 0 else 0,
             'buy_time': str(p.get('buy_time', '')),
             'status': st, 'status_color': si,
         })
@@ -332,6 +334,19 @@ def api_chart(symbol):
         pass
     return jsonify({'candles': [], 'symbol': symbol})
 
+
+@app.route('/api/live_price/<path:symbol>')
+@login_required
+def api_live_price(symbol):
+    try:
+        bs = symbol.replace('/', '')
+        url = f"{BINANCE_API}/ticker/price?symbol={bs}"
+        resp = requests.get(url, timeout=3)
+        if resp.status_code == 200:
+            return jsonify({'price': float(resp.json()['price'])})
+    except:
+        pass
+    return jsonify({'price': 0})
 
 def get_login_html(error=""):
     return f"""<!DOCTYPE html>
@@ -573,7 +588,7 @@ td,th{padding:6px 4px}
 <div class="perf-legend">
 <div class="perf-leg-item"><div class="perf-dot" style="background:var(--green)"></div>Profit Zone</div>
 <div class="perf-leg-item"><div class="perf-dot" style="background:var(--red)"></div>Loss Zone</div>
-<div class="perf-leg-item"><div class="perf-dot" style="background:#f59e0b"></div>Buy Price</div>
+<div class="perf-leg-item"><div class="perf-dot" style="background:#f59e0b"></div>Buy Price</div><div class="perf-leg-item"><div class="perf-dot" style="background:#10b981"></div>TP</div><div class="perf-leg-item"><div class="perf-dot" style="background:#ef4444"></div>SL</div><div class="perf-leg-item"><div class="perf-dot" style="background:#3b82f6"></div>Live: <span id="liveP" style="color:#3b82f6">-</span></div>
 </div>
 <div id="chart2"></div>
 </div>
@@ -597,7 +612,7 @@ td,th{padding:6px 4px}
 
 <script>
 var ch=null,cs=null,lineSeries=null,volSeries=null,bl=null,curSym=null;
-var ch2=null,baseSeries=null,bl2=null;
+var ch2=null,baseSeries=null,bl2=null,bl3=null,bl4=null,liveTimer=null;
 var lastNotifId=parseInt(localStorage.getItem('lastNId')||'0');
 var coinColors={BTC:'#f7931a',ETH:'#627eea',SOL:'#9945ff',ADA:'#0033ad',XLM:'#14b6e7',DOT:'#e6007a',AVAX:'#e84142',LTC:'#bfbbbb',UNI:'#ff007a',LINK:'#2a5ada',FIL:'#0090ff',VET:'#15bdff',ETC:'#328332',ICP:'#29abe2',THETA:'#2ab8e6',HBAR:'#8a8a8a',DOGE:'#c3a634',XRP:'#00aae4',BNB:'#f3ba2f',ALGO:'#000',TRX:'#ff0013'};
 
@@ -688,7 +703,7 @@ ch2.applyOptions({width:document.getElementById('chart2').clientWidth});
 });
 }
 
-function loadC(sym,bp){
+function loadC(sym,bp,slP,tpP){
 curSym=sym;
 var coin=sym.replace('/USDT','');
 var cc=coinColors[coin]||'#3b82f6';
@@ -828,7 +843,7 @@ row.innerHTML='<td><div class="coin-name"><div class="coin-icon" style="backgrou
 
 var btn=document.createElement('button');
 btn.className='chart-btn';btn.textContent='📈';
-btn.onclick=function(){loadC(p.symbol,p.buy_price)};
+btn.onclick=function(){loadC(p.symbol,p.buy_price,p.sl_price||0,p.tp_price||0)};
 row.lastChild.appendChild(btn);
 tb.appendChild(row);
 
@@ -837,11 +852,11 @@ tabBtn.className='tab'+(p.symbol===curSym?' act':'');
 tabBtn.setAttribute('data-s',p.symbol);
 tabBtn.textContent=coin;
 tabBtn.style.borderColor=cc+'30';
-tabBtn.onclick=function(){loadC(p.symbol,p.buy_price)};
+tabBtn.onclick=function(){loadC(p.symbol,p.buy_price,p.sl_price||0,p.tp_price||0)};
 tabs.appendChild(tabBtn);
 });
 
-if(!curSym&&d.positions.length>0){loadC(d.positions[0].symbol,d.positions[0].buy_price)}
+if(!curSym&&d.positions.length>0){var fp=d.positions[0];loadC(fp.symbol,fp.buy_price,fp.sl_price||0,fp.tp_price||0)}
 });
 }
 
