@@ -660,7 +660,7 @@ html+='</div>';
 rl.innerHTML=html;
 }
 
-var livePrices=[];
+var livePrices=[];var cvs=document.getElementById('chart2canvas');if(cvs){var ct=cvs.getContext('2d');ct.clearRect(0,0,cvs.width,cvs.height);}
 var maxPoints=120;
 
 function initC(){
@@ -745,7 +745,7 @@ document.getElementById('cSym').style.color=cc;
 document.getElementById('cSym2').textContent=coin+' Live';
 document.getElementById('cSym2').style.color=cc;
 document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('act',t.getAttribute('data-s')===sym)});
-livePrices=[];
+livePrices=[];var cvs=document.getElementById('chart2canvas');if(cvs){var ct=cvs.getContext('2d');ct.clearRect(0,0,cvs.width,cvs.height);}
 fetch('/api/chart/'+encodeURIComponent(sym))
 .then(function(r){return r.json()})
 .then(function(d){
