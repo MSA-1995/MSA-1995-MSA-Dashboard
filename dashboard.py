@@ -127,7 +127,7 @@ class SmartCache:
 
     def get_bot_status(self):
         now = time.time()
-        if now - self.last_status > 30:
+        if now - self.last_status > 45:
             status = db.load_bot_status()
             if status:
                 with self.lock:
