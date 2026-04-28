@@ -560,7 +560,6 @@ td,th{padding:6px 4px}
 <!-- Market Status Bar -->
 <div class="market-bar" id="mBar">
 <div class="mb-item"><span>🌐</span><div><div class="mb-label">Macro Trend</div><div class="mb-val" id="mbMacro">-</div></div></div>
-<div class="mb-item"><span>🔮</span><div><div class="mb-label">Timeframes</div><div class="mb-val" id="mbTF">-</div></div></div>
 <div class="mb-item"><span>💰</span><div><div class="mb-label">Balance</div><div class="mb-val mb-blue" id="mbBal">-</div></div></div>
 <div class="mb-item"><span>📊</span><div><div class="mb-label">Invested</div><div class="mb-val mb-yellow" id="mbInv">-</div></div></div>
 <div class="mb-item"><span>🔒</span><div><div class="mb-label">Locked Profit</div><div class="mb-val mb-green" id="mbLock">-</div></div></div>
@@ -896,11 +895,8 @@ var s=d.summary;
 var bs=d.bot_status||{};
 var macro=bs.macro_status||'UNKNOWN';
 var el=document.getElementById('mbMacro');
-el.textContent=getMacroEmoji(macro)+' '+macro;
+el.textContent=macro; // ✅ استخدام الماكرو مباشرة لأنه يحتوي بالفعل على الإيموجي
 el.style.color=getMacroColor(macro);
-var i1=bs['1h_icon']||'⚪';
-var i4=bs['4h_icon']||'⚪';
-document.getElementById('mbTF').innerHTML='1h'+i1+' | 4h'+i4;
 document.getElementById('mbBal').textContent='$'+(bs.balance||0).toLocaleString(undefined,{maximumFractionDigits:2});
 document.getElementById('mbInv').textContent='$'+(bs.invested||s.total_invested||0).toLocaleString(undefined,{maximumFractionDigits:2});
 document.getElementById('mbLock').textContent='$'+(bs.locked_profit||0).toLocaleString(undefined,{maximumFractionDigits:2});
